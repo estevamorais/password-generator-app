@@ -6,6 +6,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 2rem 1rem;
 }
 
 .app__container {
@@ -245,42 +246,42 @@
       margin-left: 0.5rem;
     }
   }
-}
 
-.app__form-strength-items--weak {
-  span {
-    &:nth-child(1) {
-      background-color: $red;
-      border-color: $red;
+  &[data-strength="Weak"] {
+    span {
+      &:nth-child(1) {
+        background-color: $red;
+        border-color: $red;
+      }
     }
   }
-}
 
-.app__form-strength-items--medium {
-  span {
-    &:nth-child(1),
-    &:nth-child(2) {
-      background-color: $yellow;
-      border-color: $yellow;
+  &[data-strength="Medium"] {
+    span {
+      &:nth-child(1),
+      &:nth-child(2) {
+        background-color: $yellow;
+        border-color: $yellow;
+      }
     }
   }
-}
 
-.app__form-strength-items--strong {
-  span {
-    &:nth-child(1),
-    &:nth-child(2),
-    &:nth-child(3) {
-      background-color: $orange;
-      border-color: $orange;
+  &[data-strength="Strong"] {
+    span {
+      &:nth-child(1),
+      &:nth-child(2),
+      &:nth-child(3) {
+        background-color: $orange;
+        border-color: $orange;
+      }
     }
   }
-}
 
-.app__form-strength-items--very-strong {
-  span {
-    background-color: $green;
-    border-color: $green;
+  &[data-strength="Very Strong"] {
+    span {
+      background-color: $green;
+      border-color: $green;
+    }
   }
 }
 
@@ -307,8 +308,17 @@
     line-height: 0;
   }
 
-  &:hover {
-    background-color: $primary;
-    color: $dark-1;
+  &:not([disabled]) {
+    &:hover {
+      background-color: $primary;
+      color: $dark-1;
+    }
+  }
+
+  &[disabled] {
+    border-color: $light;
+    color: $light;
+    cursor: not-allowed;
+    opacity: 0.3;
   }
 }

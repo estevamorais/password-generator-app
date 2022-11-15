@@ -1,9 +1,10 @@
 import "./App.scss";
 import { useState, useEffect, useRef } from "react";
 
-const strengths = ["Weak", "Medium", "Strong", "Very Strong"];
-
 const App = () => {
+  const maxLength = 20;
+  const minLength = 0;
+
   const [password, setPassword] = useState();
   const [length, setLength] = useState(10);
   const [uppercase, setUppercase] = useState(true);
@@ -12,13 +13,35 @@ const App = () => {
   const [symbols, setSymbols] = useState(false);
   const [strength, setStrength] = useState();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handlePassword = () => {
+    let caracsGroups = [];
+    if (uppercase) caracsGroups.push("ABCDEFGHIJKLMNOPQRSTUVWXY".split(""));
+    if (lowercase) caracsGroups.push("abcdefghijklmnopqrstuvwxy".split(""));
+    if (numbers) caracsGroups.push("0123456789".split(""));
+    if (symbols) caracsGroups.push("~!@#$%^&*(-)_+={}[]|:;<>,.?".split(""));
+
+    let _password = "";
+    for (let i = 1; i <= length; i++) {
+      let group = caracsGroups[Math.floor(Math.random() * caracsGroups.length)];
+      let carac = group[Math.floor(Math.random() * group.length)];
+      _password += carac;
+    }
+
+    setPassword(_password);
   };
 
-  const rangeInput = useRef(null);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handlePassword();
+  };
 
-  function handleInputChange() {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(password);
+  };
+
+  // Setting Length and range input backgroundSize
+  const rangeInput = useRef(null);
+  const handleInputChange = () => {
     const min = rangeInput.current.min;
     const max = rangeInput.current.max;
     const val = rangeInput.current.value;
@@ -27,27 +50,63 @@ const App = () => {
       ((val - min) * 100) / (max - min) + "% 100%";
 
     setLength(val);
-  }
-
-  console.log(rangeInput);
+  };
 
   useEffect(() => {
-    if (rangeInput) {
-      handleInputChange();
-    }
+    if (rangeInput) handleInputChange();
   }, [rangeInput]);
+
+  // Generate password on first page load
+  useEffect(handlePassword, []);
+
+  // Disable submit button when options are not defined
+  const buttonSubmit = useRef(null);
+  useEffect(() => {
+    if (length === "0" || (!uppercase && !lowercase && !numbers && !symbols)) {
+      buttonSubmit.current.setAttribute("disabled", "");
+    } else {
+      buttonSubmit.current.removeAttribute("disabled");
+    }
+  }, [length, uppercase, lowercase, numbers, symbols]);
+
+  // Setting Strength when the password changes
+  useEffect(() => {
+    if (!password) return;
+
+    let points = 0;
+    let _strength = "";
+
+    points = lowercase ? points + 1 : points;
+    points = uppercase ? points + 1 : points;
+    points = numbers ? points + 2 : points;
+    points = symbols ? points + 2 : points;
+
+    if (password.length > 12) points = points + 8;
+    else if (password.length >= 9) points = points + 6;
+    else if (password.length >= 7) points = points + 4;
+    else if (password.length >= 6) points = points + 2;
+    else points = points + 1;
+
+    if (points > 11) _strength = "Very Strong";
+    else if (points > 9) _strength = "Strong";
+    else if (points > 7) _strength = "Medium";
+    else _strength = "Weak";
+
+    setStrength(_strength);
+  }, [password]);
 
   return (
     <div className="app">
       <div className="app__container">
         <h1 className="app__title">Password Generator</h1>
+
         <div className="app__password">
-          {password && <span>{password}</span>}
-          {!password && <span className="empty">P4$5W0rD!</span>}
-          <button>
+          <span>{password}</span>
+          <button onClick={handleCopy}>
             <ion-icon name="copy-outline"></ion-icon>
           </button>
         </div>
+
         <form className="app__form" onSubmit={handleSubmit}>
           <div className="app__form-length">
             <header htmlFor="length">
@@ -57,8 +116,8 @@ const App = () => {
               type="range"
               name="length"
               id="length"
-              min="0"
-              max="20"
+              min={minLength}
+              max={maxLength}
               value={length}
               onInput={handleInputChange}
               ref={rangeInput}
@@ -110,12 +169,8 @@ const App = () => {
 
           <div className="app__form-strength">
             <span className="app__form-strength-title">strength</span>
-            <span
-              className={`app__form-strength-items app__form-strength-items--${strengths[3]
-                .replace(" ", "-")
-                .toLocaleLowerCase()}`}
-            >
-              {strengths[3]}
+            <span className="app__form-strength-items" data-strength={strength}>
+              {strength}
               <span></span>
               <span></span>
               <span></span>
@@ -123,8 +178,8 @@ const App = () => {
             </span>
           </div>
 
-          <button className="app__form-button" type="submit">
-            <span>Generate</span>{" "}
+          <button className="app__form-button" type="submit" ref={buttonSubmit}>
+            <span>Generate</span>
             <ion-icon name="arrow-forward-outline"></ion-icon>
           </button>
         </form>
