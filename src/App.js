@@ -5,34 +5,62 @@ const App = () => {
   const maxLength = 20;
   const minLength = 0;
 
-  const [password, setPassword] = useState();
   const [length, setLength] = useState(10);
   const [uppercase, setUppercase] = useState(true);
   const [lowercase, setLowercase] = useState(true);
   const [numbers, setNumbers] = useState(false);
   const [symbols, setSymbols] = useState(false);
-  const [strength, setStrength] = useState();
 
   const handlePassword = () => {
-    let caracsGroups = [];
-    if (uppercase) caracsGroups.push("ABCDEFGHIJKLMNOPQRSTUVWXY".split(""));
-    if (lowercase) caracsGroups.push("abcdefghijklmnopqrstuvwxy".split(""));
-    if (numbers) caracsGroups.push("0123456789".split(""));
-    if (symbols) caracsGroups.push("~!@#$%^&*(-)_+={}[]|:;<>,.?".split(""));
+    let options = [];
+    if (uppercase) options.push("ABCDEFGHIJKLMNOPQRSTUVWXY".split(""));
+    if (lowercase) options.push("abcdefghijklmnopqrstuvwxy".split(""));
+    if (numbers) options.push("0123456789".split(""));
+    if (symbols) options.push("~!@#$%^&*(-)_+={}[]|:;<>,.?".split(""));
 
-    let _password = "";
-    for (let i = 1; i <= length; i++) {
-      let group = caracsGroups[Math.floor(Math.random() * caracsGroups.length)];
-      let carac = group[Math.floor(Math.random() * group.length)];
-      _password += carac;
+    if (options.length) {
+      let _password = "";
+      for (let i = 1; i <= length; i++) {
+        let caracs = options[Math.floor(Math.random() * options.length)];
+        let carac = caracs[Math.floor(Math.random() * caracs.length)];
+        _password += carac;
+      }
+      return _password;
     }
-
-    setPassword(_password);
   };
+
+  const handleStrength = () => {
+    if (!password) return;
+
+    let points = 0;
+    let _strength = "";
+
+    points = lowercase ? points + 1 : points;
+    points = uppercase ? points + 1 : points;
+    points = numbers ? points + 2 : points;
+    points = symbols ? points + 2 : points;
+
+    if (password.length > 12) points = points + 8;
+    else if (password.length >= 9) points = points + 6;
+    else if (password.length >= 7) points = points + 4;
+    else if (password.length >= 6) points = points + 2;
+    else points = points + 1;
+
+    if (points > 11) _strength = "Very Strong";
+    else if (points > 9) _strength = "Strong";
+    else if (points > 7) _strength = "Medium";
+    else _strength = "Weak";
+
+    return _strength;
+  };
+
+  const [password, setPassword] = useState(handlePassword());
+  const [strength, setStrength] = useState(handleStrength());
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handlePassword();
+    setPassword(handlePassword());
+    setStrength(handleStrength());
   };
 
   const handleCopy = () => {
@@ -56,9 +84,6 @@ const App = () => {
     if (rangeInput) handleInputChange();
   }, [rangeInput]);
 
-  // Generate password on first page load
-  useEffect(handlePassword, []);
-
   // Disable submit button when options are not defined
   const buttonSubmit = useRef(null);
   useEffect(() => {
@@ -68,32 +93,6 @@ const App = () => {
       buttonSubmit.current.removeAttribute("disabled");
     }
   }, [length, uppercase, lowercase, numbers, symbols]);
-
-  // Setting Strength when the password changes
-  useEffect(() => {
-    if (!password) return;
-
-    let points = 0;
-    let _strength = "";
-
-    points = lowercase ? points + 1 : points;
-    points = uppercase ? points + 1 : points;
-    points = numbers ? points + 2 : points;
-    points = symbols ? points + 2 : points;
-
-    if (password.length > 12) points = points + 8;
-    else if (password.length >= 9) points = points + 6;
-    else if (password.length >= 7) points = points + 4;
-    else if (password.length >= 6) points = points + 2;
-    else points = points + 1;
-
-    if (points > 11) _strength = "Very Strong";
-    else if (points > 9) _strength = "Strong";
-    else if (points > 7) _strength = "Medium";
-    else _strength = "Weak";
-
-    setStrength(_strength);
-  }, [password]);
 
   return (
     <div className="app">
