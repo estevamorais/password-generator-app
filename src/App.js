@@ -30,8 +30,6 @@ const App = () => {
   };
 
   const handleStrength = () => {
-    if (!password) return;
-
     let points = 0;
     let _strength = "";
 
@@ -40,10 +38,10 @@ const App = () => {
     points = numbers ? points + 2 : points;
     points = symbols ? points + 2 : points;
 
-    if (password.length > 12) points = points + 8;
-    else if (password.length >= 9) points = points + 6;
-    else if (password.length >= 7) points = points + 4;
-    else if (password.length >= 6) points = points + 2;
+    if (length > 12) points = points + 8;
+    else if (length >= 9) points = points + 6;
+    else if (length >= 7) points = points + 4;
+    else if (length >= 6) points = points + 2;
     else points = points + 1;
 
     if (points > 11) _strength = "Very Strong";
