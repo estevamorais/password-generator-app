@@ -1,4 +1,4 @@
-import "./App.scss";
+import "./styles/app.scss";
 import { useState, useEffect, useRef } from "react";
 
 const App = () => {
